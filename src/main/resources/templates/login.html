@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+</head>
+<body>
+    <form method="post">
+        <label>
+            <input type="text" autocomplete="off" placeholder="用户名" name="userName" required/>
+            用户名：
+        </label>
+        <label>
+            <input type="password" autocomplete="off" placeholder="密码" name="password" required/>
+            密码
+        </label>
+        <button type="submit" onclick="login()">登录</button>
+    </form>
+
+    <script type="text/javascript" src="../static/js/jquery-3.4.1.js"></script>
+    <script>
+
+        function login(){
+            var url = 'http://localhost:8080/login';
+            var user=document.getElementById("userName").value;
+            var pwd=document.getElementById("password").value;
+
+            $.post(
+                url,
+                {
+                    'userName': user,
+                    'password': pwd
+                },
+                function (data, status) {
+                    if (data.code == 200){
+                        window.location.href = 'http://localhost:8080/success';
+                    }
+                }
+            )
+        }
+
+    </script>
+</body>
+</html>

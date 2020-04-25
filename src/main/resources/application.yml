@@ -1,0 +1,11 @@
+server:
+  port: 8070
+
+spring:
+  jpa:
+    show-sql: true
+
+  datasource:
+    username: root
+    password: 654123
+    url: jdbc:mysql://localhost:3306/PigPrice?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
