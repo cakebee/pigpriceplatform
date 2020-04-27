@@ -35,4 +35,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.getOne(userName);
     }
 
+    @Override
+    public User getUserInfo(String token) {
+        return userRepository.getByToken(token);
+    }
+
 }

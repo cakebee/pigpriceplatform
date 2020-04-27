@@ -1,6 +1,10 @@
 package com.nmzl.pigpriceplatform.config;
 
+import com.nmzl.pigpriceplatform.filter.JWTFilter;
+import com.nmzl.pigpriceplatform.filter.ShrioUserFIlter;
 import com.nmzl.pigpriceplatform.shiro.CustomRealm;
+import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -13,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
+import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -41,7 +46,13 @@ public class ShiroConfig {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //将自定义的realm交给SecurityManager管理
         securityManager.setRealm(customRealm);
-        securityManager.setRememberMeManager(rememberMeManager());
+        //关闭shiro自带的session
+        DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
+        DefaultSessionStorageEvaluator evaluator = new DefaultSessionStorageEvaluator();
+        evaluator.setSessionStorageEnabled(false);
+        subjectDAO.setSessionStorageEvaluator(evaluator);
+        securityManager.setSubjectDAO(subjectDAO);
+        //securityManager.setRememberMeManager(rememberMeManager());
         return securityManager;
     }
 
@@ -49,6 +60,7 @@ public class ShiroConfig {
      * cookie对象;
      * @return
      */
+    @Deprecated
     private SimpleCookie rememberMeCookie(){
         //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
@@ -61,6 +73,7 @@ public class ShiroConfig {
      * cookie管理对象;记住我功能
      * @return
      */
+    @Deprecated
     private CookieRememberMeManager rememberMeManager(){
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(rememberMeCookie());
@@ -82,13 +95,19 @@ public class ShiroConfig {
         //设置securityManager
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
+        Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
+        filters.put("authc", new JWTFilter());
+        shiroFilterFactoryBean.setFilters(filters);
+
         //配置拦截链 使用LinkedHashMap,因为LinkedHashMap是有序的，shiro会根据添加的顺序进行拦截
         // Map<K,V> K指的是拦截的url V值的是该url是否拦截
         Map<String,String> filterChainMap = new LinkedHashMap<String,String>(16);
         //配置退出过滤器logout，由shiro实现
         filterChainMap.put("/logout","logout");
-        //authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问,先配置anon再配置authc。
+        //登录阶段相关
         filterChainMap.put("/login","anon");
+        filterChainMap.put("/userInfo/*","anon");
+        //authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问,先配置anon再配置authc。
         filterChainMap.put("/**", "authc");
         // 未授权界面;
         shiroFilterFactoryBean.setUnauthorizedUrl("/403");

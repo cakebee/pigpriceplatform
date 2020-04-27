@@ -11,7 +11,7 @@ import lombok.Data;
 public class Msg {
 
     /** 状态码 */
-    private byte code = 1;
+    private int code = 20000;
 
     /** 描述 */
     private String message;

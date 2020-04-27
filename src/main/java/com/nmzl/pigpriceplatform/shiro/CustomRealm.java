@@ -1,7 +1,9 @@
 package com.nmzl.pigpriceplatform.shiro;
 
 import com.nmzl.pigpriceplatform.entity.User;
+import com.nmzl.pigpriceplatform.pojo.JWTToken;
 import com.nmzl.pigpriceplatform.service.UserService;
+import com.nmzl.pigpriceplatform.util.JWTUtil;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -26,8 +28,16 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
     @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof JWTToken;
+    }
+
+
+    //TODO
+    @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        User user = (User) principalCollection.getPrimaryPrincipal();
+        String username = JWTUtil.getUsername(principalCollection.getPrimaryPrincipal().toString());
+        User user = userService.getUser(username);
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.addRole(user.getRole());
 
@@ -36,17 +46,22 @@ public class CustomRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        String token = (String) authenticationToken.getCredentials();
+        String userName = JWTUtil.getUsername(token);
         if (authenticationToken.getPrincipal() == null) {
             return null;
         }
 
-        String userName = (String) authenticationToken.getPrincipal();
         User user = userService.getUser(userName);
         if (user == null) {
             return null;
         }
+        //TODO 字符串常量替换
+        if (!JWTUtil.verify(token, userName, user.getPassword())) {
+            throw new AuthenticationException("认证失败，重新登录");
+        }
 
-        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+        return new SimpleAuthenticationInfo(token, token, getName());
     }
 
 }

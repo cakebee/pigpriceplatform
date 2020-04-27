@@ -1,5 +1,7 @@
 package com.nmzl.pigpriceplatform.entity;
 
+import org.hibernate.annotations.Proxy;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,11 +12,13 @@ import java.util.Objects;
  * @author : zxy
  * @date : 2020/4/4 14:25
  */
+@Proxy(lazy = false)
 @Entity
 public class User {
     private String username;
     private String password;
     private String role;
+    private String token;
 
     @Id
     @Column(name = "username")
@@ -59,5 +63,15 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(username, password, role);
+    }
+
+    @Basic
+    @Column(name = "token")
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

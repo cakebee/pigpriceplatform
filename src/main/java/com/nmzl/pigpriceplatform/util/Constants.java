@@ -20,9 +20,9 @@ public class Constants {
     public static final String USER_LOGOUT_SUCCESS = "注销成功";
 
     /** status code set */
-    public static final byte CODE_SUCCESS = 1;
+    public static final int CODE_SUCCESS = 20000;
 
-    public static final byte CODE_FAILED = 2;
+    public static final int CODE_FAILED = 2;
 
     /** path set*/
     public static final String PATH_HOME = "";

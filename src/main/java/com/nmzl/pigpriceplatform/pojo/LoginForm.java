@@ -11,11 +11,8 @@ import lombok.Data;
 public class LoginForm {
 
     /** 用户名 */
-    private String user;
+    private String username;
 
     /** 密码 */
     private String password;
-
-    /** 记住我 */
-    private boolean rememberMe;
 }

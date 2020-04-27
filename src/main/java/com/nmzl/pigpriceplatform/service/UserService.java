@@ -35,4 +35,14 @@ public interface UserService {
      */
     User getUser(String userName);
 
+
+    /**
+     * 根据token获取用户信息
+     * @param token: 用户登录后后端返回给前端的token
+     * @return :
+     * @author : zxy
+     * @date : 2020/4/26 9:41 下午
+     */
+    User getUserInfo(String token);
+
 }
