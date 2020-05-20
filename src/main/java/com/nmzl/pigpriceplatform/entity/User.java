@@ -1,5 +1,7 @@
 package com.nmzl.pigpriceplatform.entity;
 
+import com.nmzl.pigpriceplatform.pojo.UserRegisterForm;
+import com.nmzl.pigpriceplatform.util.Constants;
 import org.hibernate.annotations.Proxy;
 
 import javax.persistence.Basic;

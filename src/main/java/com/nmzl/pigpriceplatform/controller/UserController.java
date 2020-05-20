@@ -1,24 +1,20 @@
 package com.nmzl.pigpriceplatform.controller;
 
 import com.nmzl.pigpriceplatform.entity.User;
+import com.nmzl.pigpriceplatform.exception.RegisterException;
+import com.nmzl.pigpriceplatform.pojo.UserRegisterForm;
 import com.nmzl.pigpriceplatform.pojo.LoginForm;
 import com.nmzl.pigpriceplatform.pojo.Msg;
 import com.nmzl.pigpriceplatform.pojo.MsgFactory;
 import com.nmzl.pigpriceplatform.service.UserService;
-import com.nmzl.pigpriceplatform.service.impl.UserServiceImpl;
 import com.nmzl.pigpriceplatform.util.Constants;
 import com.nmzl.pigpriceplatform.util.JWTUtil;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.apache.shiro.subject.Subject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**TODO
@@ -78,10 +74,9 @@ public class UserController {
 
         User user = userService.getUser(loginForm.getUsername());
         if (user.getPassword().equals(loginForm.getPassword())) {
-            System.out.println(loginForm.getUsername() + loginForm.getPassword());
-            return msgFactory.success()
-                    .setData(JWTUtil.sign(loginForm.getUsername(),
-                            loginForm.getPassword()));
+            Map<String, String> map = new HashMap<>();
+            map.put("token", JWTUtil.sign(loginForm.getUsername(), loginForm.getPassword()));
+            return Msg.success().setData(map);
         }
         return msgFactory.fail();
     }
@@ -93,14 +88,33 @@ public class UserController {
 
     @RequestMapping(value = "/userInfo/{token}", method = RequestMethod.GET)
     public Msg userInfo(@PathVariable String token) {
-        User user = userService.getUserInfo(token);
+        User user = userService.getUser(JWTUtil.getUsername(token));
         if (user == null) {
             return msgFactory.fail().setMessage(Constants.USER_LOGIN_NO_SUCH_USER);
         } else {
             return msgFactory.success()
-                             .setMessage(Constants.MESSAGE_SUCCESS)
                              .setData(user);
         }
+    }
+
+    @PostMapping(value = "/user")
+    public Msg userRegister(@RequestBody UserRegisterForm form) {
+        try {
+            userService.register(form);
+        } catch (RegisterException exception) {
+            return Msg.failed().setMessage(exception.getMessage());
+        }
+        return Msg.success().setMessage("提交成功，请在邮箱中激活该账号");
+    }
+
+    @GetMapping(value = "/user/verify/{token}")
+    public Msg userVerify(@PathVariable("token") String token) {
+        try {
+            userService.verifyEmail(token);
+        } catch (RegisterException exception) {
+            return Msg.failed().setMessage(exception.getMessage());
+        }
+        return Msg.success().setMessage("验证成功");
     }
 
     @RequiresRoles("admin")

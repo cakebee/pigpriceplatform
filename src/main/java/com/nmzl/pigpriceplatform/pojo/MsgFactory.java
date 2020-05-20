@@ -12,7 +12,6 @@ public class MsgFactory{
     public Msg success() {
         Msg msg = new Msg();
         msg.setCode(Constants.CODE_SUCCESS);
-        msg.setMessage(Constants.MESSAGE_SUCCESS);
         return msg;
     }
 

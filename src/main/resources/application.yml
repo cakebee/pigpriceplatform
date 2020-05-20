@@ -4,7 +4,13 @@ server:
 spring:
   jpa:
     show-sql: true
+    open-in-view: true
 
+
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 500
   datasource:
     username: root
     password: 654123

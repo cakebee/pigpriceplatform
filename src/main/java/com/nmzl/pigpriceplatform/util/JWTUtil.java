@@ -9,8 +9,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import java.util.Date;
 
 public class JWTUtil {
-    // 过期时间5分钟
-    private static final long EXPIRE_TIME = 5*60*1000;
+    // 过期时间
+    private static final long EXPIRE_TIME =  Constants.TIME_TOKEN_EXPIRE;
 
     /**
      * 校验token是否正确

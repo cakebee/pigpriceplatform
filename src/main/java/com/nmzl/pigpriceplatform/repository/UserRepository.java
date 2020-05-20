@@ -14,4 +14,6 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, String>, Serializable {
     User getByToken(String token);
+
+    User findByUsername(String userName);
 }

@@ -1,25 +1,20 @@
 package com.nmzl.pigpriceplatform.entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Date;
 import java.util.Objects;
 
-/**
- * @author : zxy
- * @date : 2020/4/4 14:30
- */
 @Entity
 public class Price {
     private int id;
-    private int price;
+    private float price;
     private Date date;
     private byte type;
+    private int areaCode;
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int getId() {
         return id;
     }
@@ -30,11 +25,11 @@ public class Price {
 
     @Basic
     @Column(name = "price")
-    public int getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 
@@ -58,19 +53,30 @@ public class Price {
         this.type = type;
     }
 
+    @Basic
+    @Column(name = "area_code")
+    public int getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(int areaCode) {
+        this.areaCode = areaCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Price price1 = (Price) o;
         return id == price1.id &&
-                price == price1.price &&
+                Double.compare(price1.price, price) == 0 &&
                 type == price1.type &&
+                areaCode == price1.areaCode &&
                 Objects.equals(date, price1.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, price, date, type);
+        return Objects.hash(id, price, date, type, areaCode);
     }
 }

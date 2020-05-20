@@ -1,5 +1,6 @@
 package com.nmzl.pigpriceplatform.pojo;
 
+import com.nmzl.pigpriceplatform.util.Constants;
 import lombok.Data;
 
 /**
@@ -41,5 +42,38 @@ public class Msg {
     public Msg setData(Object data){
         this.data = data;
         return this;
+    }
+
+    /**
+     * 设置code
+     * @param code: 状态码
+     * @return : this
+     * @author : zxy
+     * @date : 2020/4/28 8:41 上午
+     */
+    public Msg setCode(int code) {
+        this.code = code;
+        return this;
+    }
+
+    /**
+     * 获取一个成功的Msg，设置成功的code和message
+     * @return : Msg
+     * @author : zxy
+     * @date : 2020/4/28 8:42 上午
+     */
+    public static Msg success() {
+        return new Msg().setCode(Constants.CODE_SUCCESS);
+    }
+
+    /**
+     * 获取一个失败的Msg，设置失败的code和message
+     * @return : Msg
+     * @author : zxy
+     * @date : 2020/4/28 8:43 上午
+     */
+    public static Msg failed() {
+        return new Msg().setCode(Constants.CODE_FAILED)
+                .setMessage(Constants.MESSAGE_FAILED);
     }
 }
