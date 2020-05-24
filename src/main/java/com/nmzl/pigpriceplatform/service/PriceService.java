@@ -1,9 +1,11 @@
 package com.nmzl.pigpriceplatform.service;
 
-import com.nmzl.pigpriceplatform.entity.AvgPrice;
-import com.nmzl.pigpriceplatform.entity.Price;
+import com.nmzl.pigpriceplatform.entity.*;
 import com.nmzl.pigpriceplatform.pojo.AllTypePrice;
+import com.nmzl.pigpriceplatform.pojo.ExtremePriceChart;
+import com.nmzl.pigpriceplatform.pojo.PigAndChicken;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,4 +21,14 @@ public interface PriceService {
     List<Price> insertAllPrice();
 
     List<AllTypePrice> listAllPrice(int code);
+
+    HashMap listExtremePrice(int type);
+
+    List<ChickenPrice> listChickenPrice();
+
+    List<AllAvgPrice> listAllAvgPrice();
+
+    List<PigAndChicken> listPigAndChicken();
+
+    List<Result> getPigAndChickenCovariance();
 }

@@ -1,5 +1,7 @@
 import com.nmzl.pigpriceplatform.PigpriceplatformApplication;
+import com.nmzl.pigpriceplatform.entity.AllAvgPrice;
 import com.nmzl.pigpriceplatform.entity.AvgPrice;
+import com.nmzl.pigpriceplatform.entity.ChickenPrice;
 import com.nmzl.pigpriceplatform.entity.Price;
 import com.nmzl.pigpriceplatform.service.PriceService;
 import com.nmzl.pigpriceplatform.service.impl.UserServiceImpl;
@@ -16,6 +18,7 @@ import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.subject.Subject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +26,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -34,7 +37,7 @@ import java.util.List;
  * @author : zxy
  * @date : 2020/4/3 15:05
  */
-@Transactional
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = PigpriceplatformApplication.class)
 public class testAuthentication {
@@ -98,18 +101,19 @@ public class testAuthentication {
         }
     }
 
-    @Test
-    public void readCsv() throws IOException {
+    public List<String> readCsv(String path) throws IOException {
         StringBuffer buffer = new StringBuffer();
         FSDataInputStream fsr = null;
         BufferedReader bufferedReader = null;
         String line;
+        List<String> stringList = new ArrayList<>();
         try {
-            FileSystem fs = FileSystem.get(URI.create(Constants.URL_HDFS), new Configuration());
-            fsr = fs.open(new Path(Constants.URL_HDFS));
+            FileSystem fs = FileSystem.get(URI.create(path), new Configuration());
+            fsr = fs.open(new Path(path));
             bufferedReader = new BufferedReader(new InputStreamReader(fsr));
             while ((line = bufferedReader.readLine()) != null) {
                 System.out.println(line);
+                stringList.add(line);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,6 +126,7 @@ public class testAuthentication {
                 }
             }
         }
+        return stringList;
     }
 
     @Test
@@ -131,5 +136,31 @@ public class testAuthentication {
         for (Price price : list) {
             System.out.println(i ++);
         }
+    }
+
+    @Test
+    public void convertData() throws IOException {
+        List<AllAvgPrice> list1 = priceService.listAllAvgPrice();
+        List<ChickenPrice> list2 = priceService.listChickenPrice();
+        Iterator<AllAvgPrice> iterator = list1.iterator();
+        Iterator<ChickenPrice> iterator1 = list2.iterator();
+        StringBuilder sb = new StringBuilder();
+        AllAvgPrice p;
+        ChickenPrice c = iterator1.next();
+        while (iterator.hasNext() && iterator1.hasNext()) {
+            p = iterator.next();
+            while (iterator1.hasNext()) {
+                if (p.getDate().compareTo(c.getDate()) < 0) {
+                    break;
+                }else if (p.getDate().compareTo(c.getDate()) == 0) {
+                    sb.append(p.getPrice()).append(",").append(c.getPrice()).append("\n");
+                    break;
+                }
+                c = iterator1.next();
+            }
+        }
+        FileWriter writer = new FileWriter("PigAndChicken");
+        writer.write(sb.toString());
+        writer.close();
     }
 }
